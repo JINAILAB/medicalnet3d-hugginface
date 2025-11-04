@@ -61,7 +61,7 @@ MEDICALNET_MODELS = {
         "layer_type": "basic",
         "description": "MedicalNet ResNet3D-10 pretrained on 23 medical datasets",
     },
-    "resnet50": {
+    "50": {
         "filename": "resnet_50.pth",
         "local_path": "resnet_pth/resnet_50.pth",
         "config_class": ResNet3D50Config,

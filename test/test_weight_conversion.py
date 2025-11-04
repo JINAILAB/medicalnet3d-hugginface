@@ -3,8 +3,8 @@ Test for converting old PTH files to new HuggingFace model
 """
 
 import torch
-from train.resnet_model.configuration_resnet import ResNet3D10Config
-from train.resnet_model.modeling_resnet import ResNet3D10ForImageClassification
+from resnet_model.configuration_resnet import ResNet3D10Config
+from resnet_model.modeling_resnet import ResNet3D10ForImageClassification
 from upload_resnet_to_hub import convert_old_keys_to_new
 
 
@@ -16,7 +16,7 @@ def test_weight_conversion():
     
     # 1. Load PTH file
     print("\n1. Loading PTH file")
-    pth_file = "/workspace/train/resnet_pth/resnet_10.pth"
+    pth_file = "resnet_pth/resnet_10.pth"
     checkpoint = torch.load(pth_file, map_location="cpu")
     
     if "state_dict" in checkpoint:

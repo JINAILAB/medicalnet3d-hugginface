@@ -1,1 +1,1 @@
- Download model from https://github.com/Warvito/MedicalNet-models
+Download model from https://github.com/Warvito/MedicalNet-models

@@ -3,8 +3,8 @@ ResNet3D model structure and weight loading test script
 """
 
 import torch
-from train.resnet_model.configuration_resnet import ResNet3D10Config, ResNet3D50Config
-from train.resnet_model.modeling_resnet import (
+from resnet_model.configuration_resnet import ResNet3D10Config, ResNet3D50Config
+from resnet_model.modeling_resnet import (
     ResNet3D10ForImageClassification,
     ResNet3D50ForImageClassification,
 )
@@ -21,7 +21,7 @@ def test_model_structure():
     config10 = ResNet3D10Config(
         spatial_dims=3,
         num_channels=1,
-        num_labels=400,
+        num_labels=2,
     )
     model10 = ResNet3D10ForImageClassification(config10)
     
@@ -95,7 +95,7 @@ def test_old_weight_loading():
     
     print("\n5. Old PTH File Loading Test")
     
-    pth_file = "/workspace/train/resnet_pth/resnet_10.pth"
+    pth_file = "resnet_pth/resnet_10.pth"
     
     if not os.path.exists(pth_file):
         print(f"   ⚠️  PTH file not found: {pth_file}")
