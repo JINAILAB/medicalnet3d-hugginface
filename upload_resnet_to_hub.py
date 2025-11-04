@@ -293,6 +293,140 @@ def load_pretrained_weights(model, pth_file: str):
     return model
 
 
+def create_model_readme(model_variant: str, model_name: str) -> str:
+    """
+    Create README.md content for the model card
+    
+    Args:
+        model_variant: Model variant (e.g. '10', '50-23datasets')
+        model_name: Model name to upload to Hub (e.g. "username/medicalnet-resnet3d-10")
+    
+    Returns:
+        README content as string
+    """
+    model_info = MEDICALNET_MODELS[model_variant]
+    
+    # base_model 매핑 (Tencent 공식 모델)
+    base_model_map = {
+        "10": "TencentMedicalNet/MedicalNet-Resnet10",
+        "10-23datasets": "TencentMedicalNet/MedicalNet-Resnet10",
+        "50": "TencentMedicalNet/MedicalNet-Resnet50",
+        "50-23datasets": "TencentMedicalNet/MedicalNet-Resnet50",
+        "101": "TencentMedicalNet/MedicalNet-Resnet101",
+        "152": "TencentMedicalNet/MedicalNet-Resnet152",
+        "200": "TencentMedicalNet/MedicalNet-Resnet200",
+    }
+    
+    base_model = base_model_map.get(model_variant, "TencentMedicalNet/MedicalNet-Resnet10")
+    
+    readme_content = f"""---
+library_name: transformers
+tags:
+- MedicalNet
+- medical images
+- medical
+- 3D
+- Med3D
+license: mit
+datasets:
+- TencentMedicalNet/MRBrains18
+language:
+- en
+base_model:
+- {base_model}
+thumbnail: "https://github.com/Tencent/MedicalNet/blob/master/images/logo.png?raw=true"
+
+---
+# MedicalNet for classification
+
+The MedicalNet project aggregated the dataset with diverse modalities, target organs, and pathologies to to build relatively large datasets. Based on this dataset, a series of 3D-ResNet pre-trained models and corresponding transfer-learning training code are provided. 
+
+This repository is an unofficial implementation of Tencent's Med3D model ([Med3D: Transfer Learning for 3D Medical Image Analysis](https://arxiv.org/abs/1904.00625)), originally developed for 3d segmentation tasks.
+It has been adapted for classification tasks using the 3D-ResNet backbone and made compatible with the Hugging Face library.
+
+---
+
+## License
+MedicalNet is released under the MIT License (refer to the LICENSE file for details).
+
+---
+
+## Citing MedicalNet
+If you use this code or pre-trained models, please cite the following:
+```
+    @article{{chen2019med3d,
+        title={{Med3D: Transfer Learning for 3D Medical Image Analysis}},
+        author={{Chen, Sihong and Ma, Kai and Zheng, Yefeng}},
+        journal={{arXiv preprint arXiv:1904.00625}},
+        year={{2019}}
+    }}
+```
+
+---
+
+## Model Sources
+
+- Repository: https://github.com/Tencent/MedicalNet (original)
+- Unofficial Torch Hub Wrapper: https://github.com/Warvito/MedicalNet-models
+- Unofficial Huggingface Wrapper: https://github.com/JINAILAB/medicalnet3d-hugginface
+
+---
+
+## How to Get Started with the Model
+
+```python
+from transformers import AutoConfig, AutoModelForImageClassification
+import torch
+
+config = AutoConfig.from_pretrained(
+    '{model_name}',
+    trust_remote_code=True
+)
+
+# use a model from scratch
+# model = AutoModelForImageClassification.from_config(
+#     config,
+#     trust_remote_code=True
+# )
+
+# use pretrained model
+model = AutoModelForImageClassification.from_pretrained(
+    '{model_name}',
+    trust_remote_code=True
+)
+
+x = torch.randn(1, 1, 64, 64, 64)  # Example 3D volume
+outputs = model(x)
+```
+
+---
+
+## MedicalNet Model Family
+
+**Original MedicalNet Series (Tencent on Hugging Face)**
+
+- [TencentMedicalNet/MedicalNet-Resnet10](https://huggingface.co/TencentMedicalNet/MedicalNet-Resnet10)
+- [TencentMedicalNet/MedicalNet-Resnet18](https://huggingface.co/TencentMedicalNet/MedicalNet-Resnet18)
+- [TencentMedicalNet/MedicalNet-Resnet34](https://huggingface.co/TencentMedicalNet/MedicalNet-Resnet34)
+- [TencentMedicalNet/MedicalNet-Resnet50](https://huggingface.co/TencentMedicalNet/MedicalNet-Resnet50)
+- [TencentMedicalNet/MedicalNet-Resnet101](https://huggingface.co/TencentMedicalNet/MedicalNet-Resnet101)
+- [TencentMedicalNet/MedicalNet-Resnet152](https://huggingface.co/TencentMedicalNet/MedicalNet-Resnet152)
+- [TencentMedicalNet/MedicalNet-Resnet200](https://huggingface.co/TencentMedicalNet/MedicalNet-Resnet200)
+
+**Unofficial Versions of the MedicalNet Classification Model Series**
+
+- [nwirandx/medicalnet-resnet3d10](https://huggingface.co/nwirandx/medicalnet-resnet3d10)
+- [nwirandx/medicalnet-resnet3d10-23datasets](https://huggingface.co/nwirandx/medicalnet-resnet3d10-23datasets)
+- [nwirandx/medicalnet-resnet3d50](https://huggingface.co/nwirandx/medicalnet-resnet3d50)
+- [nwirandx/medicalnet-resnet3d50-23datasets](https://huggingface.co/nwirandx/medicalnet-resnet3d50-23datasets)
+- [nwirandx/medicalnet-resnet3d101](https://huggingface.co/nwirandx/medicalnet-resnet3d101)
+- [nwirandx/medicalnet-resnet3d152](https://huggingface.co/nwirandx/medicalnet-resnet3d152)
+- [nwirandx/medicalnet-resnet3d200](https://huggingface.co/nwirandx/medicalnet-resnet3d200)
+"""
+    
+    return readme_content
+
+
 def upload_model_to_hub(
     model_variant: str,
     model_name: str,
@@ -370,6 +504,14 @@ def upload_model_to_hub(
     shutil.copy2(source_modeling_file, os.path.join(temp_dir, "modeling_resnet.py"))
     print(f"  configuration_resnet.py copied successfully")
     print(f"  modeling_resnet.py copied successfully")
+    
+    # Create and save README.md
+    print(f"\n Creating README.md...")
+    readme_content = create_model_readme(model_variant, model_name)
+    readme_path = os.path.join(temp_dir, "README.md")
+    with open(readme_path, 'w', encoding='utf-8') as f:
+        f.write(readme_content)
+    print(f"  README.md created successfully")
     
     # Upload to Hugging Face Hub
     print(f"\n Uploading to Hugging Face Hub...")
@@ -510,7 +652,7 @@ def main():
     parser.add_argument(
         "--num_labels",
         type=int,
-        default=400,
+        default=2,
         help="Output classes (default: 400, MedicalNet pretrained)",
     )
     
